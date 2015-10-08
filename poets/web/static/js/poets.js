@@ -79,25 +79,15 @@ poetsViewer.prototype.sliderPos = function(date) {
 	$("#slider").slider('setValue', date)
 }
 
-poetsViewer.prototype.initDownLink = function(anom, avg) {
-
-    var sel_var = $("#dataset").val()
-    var sel_src = $("#source").val()
-    var sel_lon = $("#lon").val()
-    var sel_lat = $("#lat").val()
+poetsViewer.prototype.initDownLink = function(anom) {
+	sel_reg = $("#region").val()
+    sel_var = $("#dataset").val()
+    sel_src = $("#source").val()
+    sel_lon = $("#lon").val()
+    sel_lat = $("#lat").val()
     
-    var link = "";
-    
-    if(avg == true) {
-		var sel_reg = $("#subregion").val()
-		link = '/_tsdown_avg/'+sel_reg+'&'+sel_src+'&'+sel_var;
-	} else {
-		var sel_reg = $("#region").val()
-		link = "_tsdown/"+sel_reg+"&"+sel_src+"&"+sel_var+"&"+sel_lon+","+sel_lat;
-	}
-    
-    var div = "#download"
-    
+    div = "#download"
+    link = "_tsdown/"+sel_reg+"&"+sel_src+"&"+sel_var+"&"+sel_lon+","+sel_lat;
     
     if(anom == true) {
     	link += '&anom';
@@ -110,7 +100,7 @@ poetsViewer.prototype.initDownLink = function(anom, avg) {
 poetsViewer.prototype.initLegend = function() {
 	// lcode is important for avoiding keeping image in cache, in order
 	// to refresh legend if dataset is changed.
-    var lcode = $("#region").val()+'&'+$("#variable").val();
+    var lcode = $("#region").val()+'&'+$("#dataset").val();
     var number = Math.floor(Math.random()*10000);
     $('#legend').attr('src', '_rlegend/'+lcode+'&'+$('#slider').val()+'&'+number);
 }
@@ -128,41 +118,35 @@ poetsViewer.prototype.setVarSelect = function() {
 			$("#dataset option[value='']").attr('selected', 'selected');
 		}
 		for(var i = 0; i < data.variables.length; i++) {
-			var d = data.variables[i];
-			$('#dataset').append(new Option(data.variables[i], data.variables[i]));
+			var varname = satidavars(data.variables[i])
+			$('#dataset').append(new Option(varname, data.variables[i]));
 			if(data.variables[i] == current) {
-				$("#dataset option[value='"+current+"']").attr('selected', 'selected');
+				$("#dataset option[value="+current+"]").attr('selected', 'selected');
 			}
 		}
 	});
 }
 
-poetsViewer.prototype.loadTS = function(lon, lat, sp_res, range, anom, avg) {
+poetsViewer.prototype.loadTS = function(lon, lat, sp_res, range, anom) {
 	
 	var reg = $("#region").val()
 	var src = $("#source").val()
 	var dataset = $("#dataset").val()
 	
-	var title = '';
-	
-	if(avg == true) {
-		var reg = $("#subregion").val()
-		link = '/_ts_avg/'+reg+'&'+src+'&'+dataset;
-		title = ' average for ' + $("#subregion").val();
-	} else {
-		link = '/_ts/'+reg+'&'+src+'&'+dataset+'&'+lon+','+lat;
-		var roundr = 1/sp_res;
-		var rdec = sp_res.toString()
-		rdec = (rdec.split('.')[1].length)
-		tlon = (Math.round(lon*roundr)/roundr).toFixed(rdec);
-		tlat = (Math.round(lat*roundr)/roundr).toFixed(rdec);
-		title = " ("+tlon+"/"+tlat+")"
-	}
+	link = '/_ts/'+reg+'&'+src+'&'+dataset+'&'+lon+','+lat;
 
 	var div = 'graph_';
 	
 	color = '#DF7401';
 	
+	var roundr = 1/sp_res;
+	var rdec = sp_res.toString()
+	rdec = (rdec.split('.')[1].length)
+	
+	tlon = (Math.round(lon*roundr)/roundr).toFixed(rdec);
+	tlat = (Math.round(lat*roundr)/roundr).toFixed(rdec);
+	
+	title = " ("+tlon+"/"+tlat+")"
 	
 	if((range[0] != -999) && range[1] != -999) {
 		vrange = range;
@@ -178,31 +162,83 @@ poetsViewer.prototype.loadTS = function(lon, lat, sp_res, range, anom, avg) {
 		title += ' with climatology (35 days)'
 	}
 	
-	$("#"+div+'body').addClass("loading");
-	
 	$.getJSON(this.host+link, function(data){
-
+		
 		for(var i=0;i<data.data.length;i++) {
-	        data.data[i][0] = new Date(data.data[i][0]);
-	        data.data[i][1] = parseFloat(data.data[i][1]);
+			data.data[i][0] = new Date(data.data[i][0]);
+			data.data[i][1] = parseFloat(data.data[i][1]);
 	    }
+		
+		var varname = satidavars(data.labels[1]);
 		
 		graph = new Dygraph(document.getElementById(div+'body'), data.data, {
 		    labels: data.labels,
 		    labelsDiv: div+'footer',
 		    drawPoints: true,
-		    digitsAfterDecimal: 5,
 		    labelsSeparateLines: false,
 		    connectSeparatedPoints:true,
-		    title: data.labels[1] + title,
+		    title: varname + title,
 		    legend: 'always',
 		    colors: [color],
 		    fillGraph: true,
 		    valueRange: vrange
 		});
 		
-		$("#"+div+'body').removeClass("loading");
-		
 	});
+}
+
+function satidavars(varname) {
 	
+	var vartext = varname;
+	
+	if(vartext == 'ECDI_18') {
+		vartext = 'Enhanced Combined Drought Index, Interest Period 180 days';
+	} 
+	if(vartext == 'ECDI_9') {
+		vartext = 'Enhanced Combined Drought Index, Interest Period 90 days';
+	}
+	if(vartext == 'ECV_sm') {
+		vartext = 'Soil Moisture';
+	}
+	if(vartext == 'ECV_sm_DI_18') {
+		vartext = 'Soil Moisture Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'ECV_sm_DI_9') {
+		vartext = 'Soil Moisture Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'MODIS_LST_dataset') {
+		vartext = 'Temperature'
+	}
+	if(vartext == 'MODIS_LST_dataset_DI_18') {
+		vartext = 'Temperature Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'MODIS_LST_dataset_DI_9') {
+		vartext = 'Temperature Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'TAMSAT_rfe') {
+		vartext = 'Rainfall'
+	}
+	if(vartext == 'TAMSAT_rfe_DI_18') {
+		vartext = 'Rainfall Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'TAMSAT_rfe_DI_9') {
+		vartext = 'Rainfall Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'Vegetation_Status_dataset') {
+		vartext = 'Vegetation Status'
+	}
+	if(vartext == 'Vegetation_Status_dataset_DI_18') {
+		vartext = 'Vegetation Status Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'Vegetation_Status_dataset_DI_9') {
+		vartext = 'Vegetation Status Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'WARNING_LEVELS_ECDI_18') {
+		vartext = 'Warning Levels, Interest Period 180 days'
+	}
+	if(vartext == 'WARNING_LEVELS_ECDI_9') {
+		vartext = 'Warning Levels, Interest Period 90 days'
+	}
+	
+	return vartext
 }

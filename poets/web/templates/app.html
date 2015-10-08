@@ -198,7 +198,131 @@ $(document).ready(function () {
         ts.loadTS(false, false, {{sp_res}}, {{ range }}, true, true);
         ts.initDownLink(false, true);
         ts.initDownLink(true, true);
-    })
+    });
+    
+    //================ SATIDA SPECIFIC STUFF ================================//
+    
+    function fillFormSelect(names, ids){
+        var c = names.length;
+        for (var i = 0; i < c; i++){
+            $("#select_form").append($('<option>', { 
+                value: ids[i],
+                text : names[i] 
+            }));
+        }
+
+        $("select option:selected").each(function(){
+            loadFormsloadSubmissionList($(this).val());
+        });
+    }
+    
+    function loadForms(){
+        $.get( "http://148.251.42.101:8080/ODKAggregate/formList", function( data ) {
+          var xmlDoc = $.parseXML(data.contents);
+          var formsNodes = xmlDoc.children[0].children;
+          var formURLs = [];
+          var formNames = [];
+          var formIDs = [];
+          var c = formsNodes.length;
+
+          for (var i = 0; i < c; i++) {
+            formURLs.push(formsNodes[i].attributes[0].nodeValue);
+            formNames.push(formsNodes[i].innerHTML);
+            formIDs.push(formsNodes[i].attributes[0].nodeValue.split("=")[1]);
+          }
+
+          fillFormSelect(formNames, formIDs);
+        });     
+    }
+    
+    
+    function loadFormsloadSubmissionList(formID){
+        var requestURL = "url=http://148.251.42.101:8080/ODKAggregate/view/submissionList?formId=" + formID;
+        $.get( requestURL, function( data ) {
+          var xmlDoc = $.parseXML(data.contents);
+          var idTags = xmlDoc.children[0].children[0].children;
+          datasetIDs = [];
+          var c = idTags.length;
+          for (var i = 0; i < c; i++){
+            downloadSubmission(formID, idTags[i].innerHTML);
+          }
+        });
+    }
+
+    function downloadSubmission(formID, submissionID){
+        var requestURL = "url=http://148.251.42.101:8080/ODKAggregate/view/downloadSubmission";
+        requestURL += "?formId=" + formID;
+        requestURL += encodeURIComponent("[@version=null%20and%20@uiVersion=null]/");
+        requestURL += formID.toUpperCase();
+        requestURL += "[@key=" + submissionID + "]";
+        $.get( requestURL, function( data ) {
+          var xmlDoc = $.parseXML(data.contents);
+          placeSubmissionMarker(xmlDoc.children[0].children[0].children[0]);
+        });
+    }
+
+    function getLocation(submissionXML){
+        var locString = $(submissionXML).find("location")[0].innerHTML;
+        var location = locString.split(" ");
+        var lonLat = new OpenLayers.LonLat(parseFloat(location[1]) ,location[0] )
+              .transform(
+                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                map.getProjectionObject() // to Spherical Mercator Projection
+              );
+        return lonLat;
+    }
+    
+    function placeSubmissionMarker(submissionXML){
+        var lonLat = getLocation(submissionXML);
+        markers.addMarker(new OpenLayers.Marker(lonLat));
+        placeSubmissionPopup(submissionXML, lonLat);
+    }
+
+    function getPopupContent(submissionXML){
+        var s = "<div><h1>Submission</h1>";
+        s += "<h2>Form Info</h2>"
+        s += "<table>";
+        var c = submissionXML.attributes.length;
+        for (var i = 0; i < c; i++){
+            s += "<tr><td>" + submissionXML.attributes[i].name + ": </td><td>" + submissionXML.attributes[i].value + "</td></tr>";
+        }
+        s += "</table>";
+        s += "<h2>Collected Info</h2>"
+        s += "<table>";
+        c = submissionXML.childNodes.length;
+        for (var i = 0; i < c; i++){
+            s += "<tr><td>" + submissionXML.childNodes[i].nodeName + ": </td><td>" + submissionXML.childNodes[i].innerHTML + "</td></tr>";
+        }
+        s += "</table>";
+        s += "</table></div>";
+        return s;
+    }
+
+    function placeSubmissionPopup(submissionXML, lonLat){
+        var popup = new OpenLayers.Popup.FramedCloud("Popup", 
+            lonLat, null, getPopupContent(submissionXML), null,
+            true // <-- true if we want a close (X) button, false otherwise
+        );
+        map.addPopup(popup);                
+    }
+    
+    function initializeViews() {
+        $(function() {
+          $("#select_form").selectmenu();
+        });
+    }
+    
+    assassments = new OpenLayers.Layer.Markers( "Assessments" );
+    map.addLayer(assassments);
+    loadForms();
+    initializeViews();
+    $("#select_form").change(function () {
+        $("select option:selected").each(function(){
+            loadFormsloadSubmissionList($(this).val());
+        });
+    });
+    
+    //========= END OF SATIDA SPECIFIC STUFF ================================//
 	
 });
 </script>
@@ -247,6 +371,11 @@ $(document).ready(function () {
 	                </button>
 	            </div>
             {% endif %}
+            <div class="form-group" style="float:right;">
+                <label for="select_form">Select assessment</label>
+                <select class="form-control" id="select_form">
+                </select>
+            </div>
 	    </form>
 	  </div>
 	  
