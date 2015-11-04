@@ -79,25 +79,15 @@ poetsViewer.prototype.sliderPos = function(date) {
 	$("#slider").slider('setValue', date)
 }
 
-poetsViewer.prototype.initDownLink = function(anom, avg) {
-
-    var sel_var = $("#dataset").val()
-    var sel_src = $("#source").val()
-    var sel_lon = $("#lon").val()
-    var sel_lat = $("#lat").val()
+poetsViewer.prototype.initDownLink = function(anom) {
+	sel_reg = $("#region").val()
+    sel_var = $("#dataset").val()
+    sel_src = $("#source").val()
+    sel_lon = $("#lon").val()
+    sel_lat = $("#lat").val()
     
-    var link = "";
-    
-    if(avg == true) {
-		var sel_reg = $("#subregion").val()
-		link = '/_tsdown_avg/'+sel_reg+'&'+sel_src+'&'+dataset;
-	} else {
-		var sel_reg = $("#region").val()
-		link = "_tsdown/"+sel_reg+"&"+sel_src+"&"+sel_var+"&"+sel_lon+","+sel_lat;
-	}
-    
-    var div = "#download"
-    
+    div = "#download"
+    link = "_tsdown/"+sel_reg+"&"+sel_src+"&"+sel_var+"&"+sel_lon+","+sel_lat;
     
     if(anom == true) {
     	link += '&anom';
@@ -110,7 +100,7 @@ poetsViewer.prototype.initDownLink = function(anom, avg) {
 poetsViewer.prototype.initLegend = function() {
 	// lcode is important for avoiding keeping image in cache, in order
 	// to refresh legend if dataset is changed.
-    var lcode = $("#region").val()+'&'+$("#variable").val();
+    var lcode = $("#region").val()+'&'+$("#dataset").val();
     var number = Math.floor(Math.random()*10000);
     $('#legend').attr('src', '_rlegend/'+lcode+'&'+$('#slider').val()+'&'+number);
 }
@@ -195,6 +185,65 @@ poetsViewer.prototype.loadTS = function(lon, lat, sp_res, range, anom) {
 		});
 		
 	});
+<<<<<<< HEAD
+=======
+}
+
+function satidavars(varname) {
+	
+	var vartext = varname;
+	
+	if(vartext == 'ECDI_18') {
+		vartext = 'Enhanced Combined Drought Index, Interest Period 180 days';
+	} 
+	if(vartext == 'ECDI_9') {
+		vartext = 'Enhanced Combined Drought Index, Interest Period 90 days';
+	}
+	if(vartext == 'ECV_sm') {
+		vartext = 'Soil Moisture';
+	}
+	if(vartext == 'ECV_sm_DI_18') {
+		vartext = 'Soil Moisture Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'ECV_sm_DI_9') {
+		vartext = 'Soil Moisture Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'MODIS_LST_dataset') {
+		vartext = 'Temperature'
+	}
+	if(vartext == 'MODIS_LST_dataset_DI_18') {
+		vartext = 'Temperature Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'MODIS_LST_dataset_DI_9') {
+		vartext = 'Temperature Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'TAMSAT_rfe') {
+		vartext = 'Rainfall'
+	}
+	if(vartext == 'TAMSAT_rfe_DI_18') {
+		vartext = 'Rainfall Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'TAMSAT_rfe_DI_9') {
+		vartext = 'Rainfall Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'Vegetation_Status_dataset') {
+		vartext = 'Vegetation Status'
+	}
+	if(vartext == 'Vegetation_Status_dataset_DI_18') {
+		vartext = 'Vegetation Status Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'Vegetation_Status_dataset_DI_9') {
+		vartext = 'Vegetation Status Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'WARNING_LEVELS_ECDI_18') {
+		vartext = 'Warning Levels, Interest Period 180 days'
+	}
+	if(vartext == 'WARNING_LEVELS_ECDI_9') {
+		vartext = 'Warning Levels, Interest Period 90 days'
+	}
+	
+	return vartext
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
 }
 
 function satidavars(varname) {

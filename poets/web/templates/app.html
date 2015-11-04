@@ -63,17 +63,14 @@ $(document).ready(function () {
 	bounds.extend(new OpenLayers.LonLat{{ex1}});
 	bounds.extend(new OpenLayers.LonLat{{ex2}});
 	bounds.transform(proj4326, map.getProjectionObject());
-	
-	image = new OpenLayers.Layer.Image('Image', "_rimg/{{region}}&{{source}}&{{variable}}&{{max}}", bounds, new OpenLayers.Size(3400, 1600), { 
-		'isBaseLayer': false,	// drawing overlay with the latest overlay image
-		'alwaysInRange': true,
-		'opacity' : opacity
-	});
-	map.addLayer(image);
-	
+	$('#slider').val("{{max}}");
+    
 	var mlayer = new OpenLayers.Layer()
 	markers = new OpenLayers.Layer.Markers("Markers");
 	map.addLayer(markers);
+	
+	loadImg();
+    map.addLayer(image);
 	
 	map.events.register("click", map, function(e) {
 		
@@ -101,11 +98,12 @@ $(document).ready(function () {
 	
 	ts.setVarSelect();
 	ts.enableButtons({{max}}, {{max}});
-	ts.initLegend();
 	
 	// LOAD IMAGE =============================================================
-	function loadImg(date) {
-		image.destroy();
+	function loadImg() {
+		if(typeof image != 'undefined') {
+			image.destroy();
+		}
         image = new OpenLayers.Layer.Image('Image', '_rimg/{{region}}&{{source}}&{{variable}}&'+$('#slider').val(), bounds, new OpenLayers.Size(3400, 1600), {
             'isBaseLayer': false,
             'alwaysInRange': true,
@@ -146,8 +144,7 @@ $(document).ready(function () {
 		value: values[1]
 	}).on('slideStop',
 		  function(ev){
-		      val = $('#slider').val();
-		      loadImg(val);
+		      loadImg();
 		      ts.enableButtons(val, {{max}});
 		  }
 	);
@@ -158,7 +155,7 @@ $(document).ready(function () {
 		$('#slider').val(val);
 		$('#slider').slider({value:val});
 		$("#dateSelect").prop("selectedIndex", val); 
-		loadImg($('#slider').val());
+		loadImg();
 		ts.enableButtons(val, {{max}});
         ts.sliderPos(val);
 	});
@@ -168,7 +165,7 @@ $(document).ready(function () {
         $('#slider').val(val);
         $('#slider').slider({value:val});
         $("#dateSelect").prop("selectedIndex", val);
-        loadImg($('#slider').val());
+        loadImg();
         ts.enableButtons(val, {{max}});
         ts.sliderPos(val);
     });
@@ -177,7 +174,7 @@ $(document).ready(function () {
 		val = $("#dateSelect").val();
 		$('#slider').val(val);
         $('#slider').slider({value:val});
-        loadImg($('#slider').val());
+        loadImg();
 		ts.enableButtons(val, {{max}});
 		ts.sliderPos(val);
 	});
@@ -201,6 +198,7 @@ $(document).ready(function () {
         ts.loadTS(false, false, {{sp_res}}, {{ range }}, false, true );
         ts.loadTS(false, false, {{sp_res}}, {{ range }}, true, true);
         ts.initDownLink(false, true);
+<<<<<<< HEAD
         ts.initDownLink(true);
     })
     
@@ -208,6 +206,13 @@ $(document).ready(function () {
 
     var formMarkers;   
  
+=======
+        ts.initDownLink(true, true);
+    });
+    
+    //================ SATIDA SPECIFIC STUFF ================================//
+    
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
     function fillFormSelect(names, ids){
         var c = names.length;
         for (var i = 0; i < c; i++){
@@ -216,6 +221,7 @@ $(document).ready(function () {
                 text : names[i] 
             }));
         }
+<<<<<<< HEAD
         $("#select_form option:selected").each(function(){
             loadFormsloadSubmissionList($(this).val());
         });
@@ -258,28 +264,53 @@ $(document).ready(function () {
     function loadForms(){
         $.get( "http://148.251.42.101:8580/odk_aggregate/formList", function( data ) {
           var xmlDoc = $.parseXML(data);
+=======
+
+        $("select option:selected").each(function(){
+            loadFormsloadSubmissionList($(this).val());
+        });
+    }
+    
+    function loadForms(){
+        $.get( "http://148.251.42.101:8080/ODKAggregate/formList", function( data ) {
+          var xmlDoc = $.parseXML(data.contents);
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
           var formsNodes = xmlDoc.children[0].children;
           var formURLs = [];
           var formNames = [];
           var formIDs = [];
           var c = formsNodes.length;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
           for (var i = 0; i < c; i++) {
             formURLs.push(formsNodes[i].attributes[0].nodeValue);
             formNames.push(formsNodes[i].innerHTML);
             formIDs.push(formsNodes[i].attributes[0].nodeValue.split("=")[1]);
           }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
           fillFormSelect(formNames, formIDs);
         });     
     }
     
     
     function loadFormsloadSubmissionList(formID){
+<<<<<<< HEAD
 	removeOldMarkers();
 	formMarkers = new OpenLayers.Layer.Markers("GeoODK Forms");
 	map.addLayer(formMarkers);
         var requestURL = "http://148.251.42.101:8580/odk_aggregate/submissionList/" + formID;
         $.get( requestURL, function( data ) {
           var xmlDoc = $.parseXML(data);
+=======
+        var requestURL = "url=http://148.251.42.101:8080/ODKAggregate/view/submissionList?formId=" + formID;
+        $.get( requestURL, function( data ) {
+          var xmlDoc = $.parseXML(data.contents);
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
           var idTags = xmlDoc.children[0].children[0].children;
           datasetIDs = [];
           var c = idTags.length;
@@ -288,6 +319,7 @@ $(document).ready(function () {
           }
         });
     }
+<<<<<<< HEAD
     function downloadSubmission(formID, submissionID){
         var requestURL = "http://148.251.42.101:8580/odk_aggregate/downloadSubmission/";
         requestURL += formID + "/" + submissionID;
@@ -296,6 +328,21 @@ $(document).ready(function () {
           placeSubmissionMarker(xmlDoc.children[0].children[0].children[0]);
         });
     }
+=======
+
+    function downloadSubmission(formID, submissionID){
+        var requestURL = "url=http://148.251.42.101:8080/ODKAggregate/view/downloadSubmission";
+        requestURL += "?formId=" + formID;
+        requestURL += encodeURIComponent("[@version=null%20and%20@uiVersion=null]/");
+        requestURL += formID.toUpperCase();
+        requestURL += "[@key=" + submissionID + "]";
+        $.get( requestURL, function( data ) {
+          var xmlDoc = $.parseXML(data.contents);
+          placeSubmissionMarker(xmlDoc.children[0].children[0].children[0]);
+        });
+    }
+
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
     function getLocation(submissionXML){
         var locString = $(submissionXML).find("location")[0].innerHTML;
         var location = locString.split(" ");
@@ -309,9 +356,14 @@ $(document).ready(function () {
     
     function placeSubmissionMarker(submissionXML){
         var lonLat = getLocation(submissionXML);
+<<<<<<< HEAD
 	popupClass = OpenLayers.Popup.FramedCloud;
 	popupContentHTML = getPopupContent(submissionXML);
 	addMarker(lonLat, popupClass, popupContentHTML, true, true);
+=======
+        markers.addMarker(new OpenLayers.Marker(lonLat));
+        placeSubmissionPopup(submissionXML, lonLat);
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
     }
 
     function getPopupContent(submissionXML){
@@ -333,6 +385,10 @@ $(document).ready(function () {
         s += "</table></div>";
         return s;
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
     function placeSubmissionPopup(submissionXML, lonLat){
         var popup = new OpenLayers.Popup.FramedCloud("Popup", 
             lonLat, null, getPopupContent(submissionXML), null,
@@ -343,7 +399,11 @@ $(document).ready(function () {
     
     function initializeViews() {
         $(function() {
+<<<<<<< HEAD
 //          $("#select_form").selectmenu();
+=======
+          $("#select_form").selectmenu();
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
         });
     }
     
@@ -352,13 +412,21 @@ $(document).ready(function () {
     loadForms();
     initializeViews();
     $("#select_form").change(function () {
+<<<<<<< HEAD
         $("#select_form option:selected").each(function(){
+=======
+        $("select option:selected").each(function(){
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
             loadFormsloadSubmissionList($(this).val());
         });
     });
     
     //========= END OF SATIDA SPECIFIC STUFF ================================//
+<<<<<<< HEAD
     
+=======
+	
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
 });
 </script>
 
@@ -406,6 +474,7 @@ $(document).ready(function () {
 	                </button>
 	            </div>
             {% endif %}
+<<<<<<< HEAD
 
             <div class="form-group" style="float:right;">
 <!--
@@ -415,6 +484,13 @@ $(document).ready(function () {
                 </select>
             </div>
 
+=======
+            <div class="form-group" style="float:right;">
+                <label for="select_form">Select assessment</label>
+                <select class="form-control" id="select_form">
+                </select>
+            </div>
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
 	    </form>
 	  </div>
 	  

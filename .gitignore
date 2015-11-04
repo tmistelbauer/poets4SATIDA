@@ -56,6 +56,11 @@ docs/_build/
 # Eclipse stuff
 .settings
 
+<<<<<<< HEAD
 # Backup files
 *.save
 *.backup
+=======
+# Condrac
+.condrac.swp
+>>>>>>> 78911424168af563b15c298b3c626cf391c0216e
