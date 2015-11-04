@@ -185,65 +185,6 @@ poetsViewer.prototype.loadTS = function(lon, lat, sp_res, range, anom) {
 		});
 		
 	});
-<<<<<<< HEAD
-=======
-}
-
-function satidavars(varname) {
-	
-	var vartext = varname;
-	
-	if(vartext == 'ECDI_18') {
-		vartext = 'Enhanced Combined Drought Index, Interest Period 180 days';
-	} 
-	if(vartext == 'ECDI_9') {
-		vartext = 'Enhanced Combined Drought Index, Interest Period 90 days';
-	}
-	if(vartext == 'ECV_sm') {
-		vartext = 'Soil Moisture';
-	}
-	if(vartext == 'ECV_sm_DI_18') {
-		vartext = 'Soil Moisture Drought Index, Interest Period 180 days'
-	}
-	if(vartext == 'ECV_sm_DI_9') {
-		vartext = 'Soil Moisture Drought Index, Interest Period 90 days'
-	}
-	if(vartext == 'MODIS_LST_dataset') {
-		vartext = 'Temperature'
-	}
-	if(vartext == 'MODIS_LST_dataset_DI_18') {
-		vartext = 'Temperature Drought Index, Interest Period 180 days'
-	}
-	if(vartext == 'MODIS_LST_dataset_DI_9') {
-		vartext = 'Temperature Drought Index, Interest Period 90 days'
-	}
-	if(vartext == 'TAMSAT_rfe') {
-		vartext = 'Rainfall'
-	}
-	if(vartext == 'TAMSAT_rfe_DI_18') {
-		vartext = 'Rainfall Drought Index, Interest Period 180 days'
-	}
-	if(vartext == 'TAMSAT_rfe_DI_9') {
-		vartext = 'Rainfall Drought Index, Interest Period 90 days'
-	}
-	if(vartext == 'Vegetation_Status_dataset') {
-		vartext = 'Vegetation Status'
-	}
-	if(vartext == 'Vegetation_Status_dataset_DI_18') {
-		vartext = 'Vegetation Status Drought Index, Interest Period 180 days'
-	}
-	if(vartext == 'Vegetation_Status_dataset_DI_9') {
-		vartext = 'Vegetation Status Drought Index, Interest Period 90 days'
-	}
-	if(vartext == 'WARNING_LEVELS_ECDI_18') {
-		vartext = 'Warning Levels, Interest Period 180 days'
-	}
-	if(vartext == 'WARNING_LEVELS_ECDI_9') {
-		vartext = 'Warning Levels, Interest Period 90 days'
-	}
-	
-	return vartext
->>>>>>> 78911424168af563b15c298b3c626cf391c0216e
 }
 
 function satidavars(varname) {
