@@ -343,17 +343,11 @@ $(document).ready(function () {
         );
         map.addPopup(popup);                
     }
-    
-    function initializeViews() {
-        $(function() {
-          $("#select_form").selectmenu();
-        });
-    }
-    
+       
     assassments = new OpenLayers.Layer.Markers( "Assessments" );
     map.addLayer(assassments);
     loadForms();
-    initializeViews();
+
     $("#select_form").change(function () {
         $("#select_form option:selected").each(function(){
             loadFormsloadSubmissionList($(this).val());
@@ -411,9 +405,6 @@ $(document).ready(function () {
             {% endif %}
 
             <div class="form-group" style="float:right;">
-<!--
-                <label for="select_form">Select assessment</label>
--->
                 <select class="form-control" id="select_form">
                 </select>
             </div>
