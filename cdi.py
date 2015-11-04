@@ -258,7 +258,8 @@ def calc_DI(data, inverse=False, interest_period=[6, 12, 24], scaled=False,
             # sumip matrix
             # calculates sum of the values for each interest period
             data['sumip'] = pd.rolling_apply(data['modf'], ip,
-                                             lambda x: sum(x), ip)
+                                             lambda x: np.nansum(x),
+                                             round(ip * 0.6))
 
             # average values for each interest period over all years
             sumip_avg = (data.groupby('period')['sumip']

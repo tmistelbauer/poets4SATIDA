@@ -218,14 +218,14 @@ if __name__ == "__main__":
     host = 'ftp.ipf.tuwien.ac.at'
     # =========================================================================
     # #Data Archive:
-    #directory = "_down/daily_files/COMBINED/"
-    #dirstruct = ['YYYY']
-    #protocol = 'SFTP'
-    #username = 'esacci_sm_v022'
-    #password = '5ZVJuN4rxsWD'
-    #filename = ("ESACCI-SOILMOISTURE-L3S-SSMV-COMBINED-{YYYY}{MM}{TT}{hh}"
+    # directory = "_down/daily_files/COMBINED/"
+    # dirstruct = ['YYYY']
+    # protocol = 'SFTP'
+    # username = 'esacci_sm_v022'
+    # password = '5ZVJuN4rxsWD'
+    # filename = ("ESACCI-SOILMOISTURE-L3S-SSMV-COMBINED-{YYYY}{MM}{TT}{hh}"
     #            "{mm}{ss}-fv02.1.nc")
-    #filedate = {'YYYY': (38, 42), 'MM': (42, 44), 'DD': (44, 46),
+    # filedate = {'YYYY': (38, 42), 'MM': (42, 44), 'DD': (44, 46),
     #            'hh': (46, 48), 'mm': (48, 50), 'ss': (50, 52)}
     # =========================================================================
     # NRT data:
@@ -248,8 +248,8 @@ if __name__ == "__main__":
                  username=username, password=password, port=port,
                  directory=directory, begin_date=begin_date,
                  variables=variables, colorbar=colorbar,
-                 valid_range=valid_range, nan_value=nan_value)#,)
-                 #dirstruct=dirstruct)
+                 valid_range=valid_range, nan_value=nan_value)  # ,)
+                 # dirstruct=dirstruct)
 
     staticsources = []
 
@@ -360,11 +360,10 @@ if __name__ == "__main__":
             elif arg == 'fill_gaps':
                 p.fill_gaps()
             elif arg == 'custom':
-                p.sources['ECV'].download_and_resample(begin=datetime(2014, 3, 21), 
+                p.sources['ECV'].download_and_resample(begin=datetime(2014, 3, 21),
                                                        end=datetime(2014, 12, 31),
                                                        delete_rawdata=True)
             else:
                 print 'unknown argument'
         else:
             print 'please give an argument'
-
