@@ -56,3 +56,6 @@ docs/_build/
 # Eclipse stuff
 .settings
 
+# Backup files
+*.save
+*.backup

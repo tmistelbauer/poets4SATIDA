@@ -11,6 +11,7 @@
 {% block body %}
 
 
+<!--<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script> -->
 <script>
 $(document).ready(function () {
 	
@@ -204,10 +205,9 @@ $(document).ready(function () {
         ts.initDownLink(true);
     })
     
-    //================ SATIDA SPECIFIC STUFF ================================//
-
-    var formMarkers;   
- 
+    
+    // SATIDA SPECIFIC STUFF:
+    	
     function fillFormSelect(names, ids){
         var c = names.length;
         for (var i = 0; i < c; i++){
@@ -216,70 +216,36 @@ $(document).ready(function () {
                 text : names[i] 
             }));
         }
-        $("#select_form option:selected").each(function(){
+
+        $("select option:selected").each(function(){
             loadFormsloadSubmissionList($(this).val());
         });
     }
-
-    function addMarker(ll, popupClass, popupContentHTML, closeBox, overflow) {
-
-            var feature = new OpenLayers.Feature(formMarkers, ll); 
-            feature.closeBox = closeBox;
-            feature.popupClass = popupClass;
-            feature.data.popupContentHTML = popupContentHTML;
-            feature.data.overflow = (overflow) ? "auto" : "hidden";
-                    
-            var marker = feature.createMarker();
-
-            var markerClick = function (evt) {
-                if (this.popup == null) {
-                    this.popup = this.createPopup(this.closeBox);
-                    map.addPopup(this.popup);
-                    this.popup.show();
-                } else {
-                    this.popup.toggle();
-                }
-                currentPopup = this.popup;
-                OpenLayers.Event.stop(evt);
-            };
-            marker.events.register("mousedown", feature, markerClick);
-
-            formMarkers.addMarker(marker);
-    }
-
-    function removeOldMarkers(){
-	if (formMarkers != null){
-		formMarkers.clearMarkers();
-		map.removeLayer(formMarkers);
-		formMarkers.destroy();
-	}
-    }
     
     function loadForms(){
-        $.get( "http://148.251.42.101:8580/odk_aggregate/formList", function( data ) {
-          var xmlDoc = $.parseXML(data);
+        $.get('http://148.251.42.101:8080/ODKAggregate/formList', function( data ) {
+          var xmlDoc = $.parseXML(data.contents);
           var formsNodes = xmlDoc.children[0].children;
           var formURLs = [];
           var formNames = [];
           var formIDs = [];
           var c = formsNodes.length;
+
           for (var i = 0; i < c; i++) {
             formURLs.push(formsNodes[i].attributes[0].nodeValue);
             formNames.push(formsNodes[i].innerHTML);
             formIDs.push(formsNodes[i].attributes[0].nodeValue.split("=")[1]);
           }
+
           fillFormSelect(formNames, formIDs);
         });     
     }
-    
+	
     
     function loadFormsloadSubmissionList(formID){
-	removeOldMarkers();
-	formMarkers = new OpenLayers.Layer.Markers("GeoODK Forms");
-	map.addLayer(formMarkers);
-        var requestURL = "http://148.251.42.101:8580/odk_aggregate/submissionList/" + formID;
+        var requestURL = "proxy?url=http://148.251.42.101:8080/ODKAggregate/view/submissionList?formId=" + formID;
         $.get( requestURL, function( data ) {
-          var xmlDoc = $.parseXML(data);
+          var xmlDoc = $.parseXML(data.contents);
           var idTags = xmlDoc.children[0].children[0].children;
           datasetIDs = [];
           var c = idTags.length;
@@ -288,14 +254,19 @@ $(document).ready(function () {
           }
         });
     }
+
     function downloadSubmission(formID, submissionID){
-        var requestURL = "http://148.251.42.101:8580/odk_aggregate/downloadSubmission/";
-        requestURL += formID + "/" + submissionID;
+        var requestURL = "proxy?url=http://148.251.42.101:8080/ODKAggregate/view/downloadSubmission";
+        requestURL += "?formId=" + formID;
+        requestURL += encodeURIComponent("[@version=null%20and%20@uiVersion=null]/");
+        requestURL += formID.toUpperCase();
+        requestURL += "[@key=" + submissionID + "]";
         $.get( requestURL, function( data ) {
-          var xmlDoc = $.parseXML(data);
+          var xmlDoc = $.parseXML(data.contents);
           placeSubmissionMarker(xmlDoc.children[0].children[0].children[0]);
         });
     }
+
     function getLocation(submissionXML){
         var locString = $(submissionXML).find("location")[0].innerHTML;
         var location = locString.split(" ");
@@ -309,9 +280,8 @@ $(document).ready(function () {
     
     function placeSubmissionMarker(submissionXML){
         var lonLat = getLocation(submissionXML);
-	popupClass = OpenLayers.Popup.FramedCloud;
-	popupContentHTML = getPopupContent(submissionXML);
-	addMarker(lonLat, popupClass, popupContentHTML, true, true);
+        markers.addMarker(new OpenLayers.Marker(lonLat));
+        placeSubmissionPopup(submissionXML, lonLat);
     }
 
     function getPopupContent(submissionXML){
@@ -333,6 +303,7 @@ $(document).ready(function () {
         s += "</table></div>";
         return s;
     }
+
     function placeSubmissionPopup(submissionXML, lonLat){
         var popup = new OpenLayers.Popup.FramedCloud("Popup", 
             lonLat, null, getPopupContent(submissionXML), null,
@@ -343,21 +314,19 @@ $(document).ready(function () {
     
     function initializeViews() {
         $(function() {
-//          $("#select_form").selectmenu();
+          $("#select_form").selectmenu();
         });
     }
     
     assassments = new OpenLayers.Layer.Markers( "Assessments" );
     map.addLayer(assassments);
     loadForms();
-    initializeViews();
+    //initializeViews();
     $("#select_form").change(function () {
-        $("#select_form option:selected").each(function(){
+        $("select option:selected").each(function(){
             loadFormsloadSubmissionList($(this).val());
         });
     });
-    
-    //========= END OF SATIDA SPECIFIC STUFF ================================//
     
 });
 </script>
@@ -406,15 +375,11 @@ $(document).ready(function () {
 	                </button>
 	            </div>
             {% endif %}
-
             <div class="form-group" style="float:right;">
-<!--
                 <label for="select_form">Select assessment</label>
--->
                 <select class="form-control" id="select_form">
                 </select>
             </div>
-
 	    </form>
 	  </div>
 	  

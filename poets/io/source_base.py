@@ -1050,6 +1050,7 @@ class BasicSource(object):
 
         nc_vars = []
         for reg in self.valid_regions:
+
             vari, _, _ = nc.get_properties(self.src_file[reg])
             if vari is None:
                 continue

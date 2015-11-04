@@ -128,8 +128,8 @@ poetsViewer.prototype.setVarSelect = function() {
 			$("#dataset option[value='']").attr('selected', 'selected');
 		}
 		for(var i = 0; i < data.variables.length; i++) {
-			var d = data.variables[i];
-			$('#dataset').append(new Option(data.variables[i], data.variables[i]));
+			var varname = satidavars(data.variables[i])
+			$('#dataset').append(new Option(varname, data.variables[i]));
 			if(data.variables[i] == current) {
 				$("#dataset option[value="+current+"]").attr('selected', 'selected');
 			}
@@ -137,32 +137,26 @@ poetsViewer.prototype.setVarSelect = function() {
 	});
 }
 
-poetsViewer.prototype.loadTS = function(lon, lat, sp_res, range, anom, avg) {
+poetsViewer.prototype.loadTS = function(lon, lat, sp_res, range, anom) {
 	
 	var reg = $("#region").val()
 	var src = $("#source").val()
 	var dataset = $("#dataset").val()
 	
-	var title = '';
-	
-	if(avg == true) {
-		var reg = $("#subregion").val()
-		link = '/_ts_avg/'+reg+'&'+src+'&'+dataset;
-		title = ' average for ' + $("#subregion").val();
-	} else {
-		link = '/_ts/'+reg+'&'+src+'&'+dataset+'&'+lon+','+lat;
-		var roundr = 1/sp_res;
-		var rdec = sp_res.toString()
-		rdec = (rdec.split('.')[1].length)
-		tlon = (Math.round(lon*roundr)/roundr).toFixed(rdec);
-		tlat = (Math.round(lat*roundr)/roundr).toFixed(rdec);
-		title = " ("+tlon+"/"+tlat+")"
-	}
+	link = '/_ts/'+reg+'&'+src+'&'+dataset+'&'+lon+','+lat;
 
 	var div = 'graph_';
 	
 	color = '#DF7401';
 	
+	var roundr = 1/sp_res;
+	var rdec = sp_res.toString()
+	rdec = (rdec.split('.')[1].length)
+	
+	tlon = (Math.round(lon*roundr)/roundr).toFixed(rdec);
+	tlat = (Math.round(lat*roundr)/roundr).toFixed(rdec);
+	
+	title = " ("+tlon+"/"+tlat+")"
 	
 	if((range[0] != -999) && range[1] != -999) {
 		vrange = range;
@@ -175,34 +169,86 @@ poetsViewer.prototype.loadTS = function(lon, lat, sp_res, range, anom, avg) {
 		link += '&anom';
 		div += 'anom_';
 		color = '#006699';
-		title += ' with climatology (35 days)'
+		title += ' moving average (window size 100 days)'
 	}
 	
-	$("#"+div+'body').addClass("loading");
-	
 	$.getJSON(this.host+link, function(data){
-
+		
 		for(var i=0;i<data.data.length;i++) {
-	        data.data[i][0] = new Date(data.data[i][0]);
-	        data.data[i][1] = parseFloat(data.data[i][1]);
+			data.data[i][0] = new Date(data.data[i][0]);
+			data.data[i][1] = parseFloat(data.data[i][1]);
 	    }
+		
+		var varname = satidavars(data.labels[1]);
 		
 		graph = new Dygraph(document.getElementById(div+'body'), data.data, {
 		    labels: data.labels,
 		    labelsDiv: div+'footer',
 		    drawPoints: true,
-		    digitsAfterDecimal: 5,
 		    labelsSeparateLines: false,
 		    connectSeparatedPoints:true,
-		    title: data.labels[1] + title,
+		    title: varname + title,
 		    legend: 'always',
 		    colors: [color],
 		    fillGraph: true,
 		    valueRange: vrange
 		});
 		
-		$("#"+div+'body').removeClass("loading");
-		
 	});
+}
+
+function satidavars(varname) {
 	
+	var vartext = varname;
+	
+	if(vartext == 'ECDI_18') {
+		vartext = 'Enhanced Combined Drought Index, Interest Period 180 days';
+	} 
+	if(vartext == 'ECDI_9') {
+		vartext = 'Enhanced Combined Drought Index, Interest Period 90 days';
+	}
+	if(vartext == 'ECV_sm') {
+		vartext = 'Soil Moisture';
+	}
+	if(vartext == 'ECV_sm_DI_18') {
+		vartext = 'Soil Moisture Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'ECV_sm_DI_9') {
+		vartext = 'Soil Moisture Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'MODIS_LST_dataset') {
+		vartext = 'Temperature'
+	}
+	if(vartext == 'MODIS_LST_dataset_DI_18') {
+		vartext = 'Temperature Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'MODIS_LST_dataset_DI_9') {
+		vartext = 'Temperature Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'TAMSAT_rfe') {
+		vartext = 'Rainfall'
+	}
+	if(vartext == 'TAMSAT_rfe_DI_18') {
+		vartext = 'Rainfall Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'TAMSAT_rfe_DI_9') {
+		vartext = 'Rainfall Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'Vegetation_Status_dataset') {
+		vartext = 'Vegetation Status'
+	}
+	if(vartext == 'Vegetation_Status_dataset_DI_18') {
+		vartext = 'Vegetation Status Drought Index, Interest Period 180 days'
+	}
+	if(vartext == 'Vegetation_Status_dataset_DI_9') {
+		vartext = 'Vegetation Status Drought Index, Interest Period 90 days'
+	}
+	if(vartext == 'WARNING_LEVELS_ECDI_18') {
+		vartext = 'Warning Levels, Interest Period 180 days'
+	}
+	if(vartext == 'WARNING_LEVELS_ECDI_9') {
+		vartext = 'Warning Levels, Interest Period 90 days'
+	}
+	
+	return vartext
 }

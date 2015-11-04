@@ -35,8 +35,9 @@
 from cStringIO import StringIO
 import os
 import json
-from flask import Flask, render_template, jsonify, make_response
+from flask import Flask, request, render_template, jsonify, make_response
 from flask.ext.cors import CORS
+import urllib2 
 import numpy as np
 import pandas as pd
 from poets.timedate.dateindex import get_dtindex
@@ -128,6 +129,7 @@ class ReverseProxied(object):
 app = Flask(__name__, static_folder='static', static_url_path='/static',
             template_folder="templates")
 app.config['CORS_HEADERS'] = 'Content-Type'
+
 # app.wsgi_app = ReverseProxied(app.wsgi_app)
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -641,3 +643,26 @@ def about():
     Creates the `about` page.
     """
     return render_template('about.html', url=url_gl)
+
+@app.route('/odk_aggregate/formList')
+def formList():
+	request = urllib2.Request('http://127.0.0.1:8080/ODKAggregate/formList')
+	request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
+	return urllib2.urlopen(request).read() 
+
+@app.route('/odk_aggregate/submissionList/<path:formid>')
+def submissionList(formid):
+	request = urllib2.Request('http://127.0.0.1:8080/ODKAggregate/view/submissionList?formId=' + formid)
+	request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
+	return urllib2.urlopen(request).read()
+
+@app.route('/odk_aggregate/downloadSubmission/<path:formid>/<path:submissionid>')
+def downloadSubmission(formid, submissionid):
+	requestURL = 'http://127.0.0.1:8080/ODKAggregate/view/downloadSubmission?'
+	requestURL += 'formId=' + formid
+	requestURL += '[@version=null%20and%20@uiVersion=null]/'
+	requestURL += formid.upper()
+	requestURL += '[@key=' + submissionid + ']'
+	request = urllib2.Request(requestURL)
+	request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
+	return urllib2.urlopen(request).read()
