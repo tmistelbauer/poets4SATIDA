@@ -116,16 +116,13 @@ def calc_weights(data, refparam, lags=[0, 10], exclude=None):
         maxlag[param] = correlations[param]['lag']
         maxcorr[param] = correlations[param]['corr']
 
-    print maxlag.keys()
-    print maxcorr.keys()
-
     for key in maxlag.keys():
         weights[key] = (float(maxlag[key])) / sum(maxlag.values()) * 100
 
     for key in maxcorr.keys():
         weights[key] = ((weights[key] +
-                         (float(maxcorr[key]) / sum(maxcorr.values())) * 100)
-                        / 2)
+                         (float(maxcorr[key]) / sum(maxcorr.values())) *
+                         100) / 2)
 
     for param in params:
         if exclude is not None and exclude in param:
