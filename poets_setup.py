@@ -19,9 +19,11 @@ if __name__ == "__main__":
     cfg_parser.read(cfg_path)
     cfg_rootpath = cfg_parser.get('settings', 'rootpath')
     cfg_shapefile = cfg_parser.get('settings', 'shapefile')
-    cfg_ip = cfg_parser.get('settings', 'ip')
+    cfg_host = cfg_parser.get('settings', 'host')
     cfg_port = cfg_parser.get('settings', 'port')
     cfg_url = cfg_parser.get('settings', 'url')
+    cfg_rhost = cfg_parser.get('settings', 'r_host')
+    cfg_rport = cfg_parser.get('settings', 'r_port')
 
     if cfg_url == 'None':
         cfg_url = None
@@ -31,8 +33,16 @@ if __name__ == "__main__":
     else:
         cfg_port = int(cfg_port)
 
-    if cfg_ip == 'None':
-        cfg_ip = None
+    if cfg_rport == 'None':
+        cfg_rport = None
+    else:
+        cfg_rport = int(cfg_rport)
+
+    if cfg_host == 'None':
+        cfg_host = None
+
+    if cfg_rhost == 'None':
+        cfg_rhost = None
 
     # POETS SETTINGS
     spatial_resolution = 0.25
@@ -117,8 +127,8 @@ if __name__ == "__main__":
             print '-o [start_app, fetch_data]'
         elif opt == '-o':
             if arg == 'start_app':
-                p.start_app(cfg_ip, port=cfg_port,
-                            url=cfg_url)
+                p.start_app(cfg_ip, port=cfg_port, r_host=cfg_rhost,
+                            r_port=cfg_rport, url=cfg_url)
             elif arg == 'fetch_data':
                 p.fetch_data()
             elif arg == 'fill_gaps':
