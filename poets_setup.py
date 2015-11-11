@@ -94,7 +94,7 @@ if __name__ == "__main__":
     filedate = {'YYYY': (38, 42), 'MM': (42, 44), 'DD': (44, 46)}
     begin_date = datetime(1978, 11, 01)
     variables = ['swi']
-    valid_range (0, 0.6)
+    valid_range = (0, 0.6)
     colorbar = 'jet_r'
     nan_value = -9999
 
