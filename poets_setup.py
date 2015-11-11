@@ -28,6 +28,8 @@ if __name__ == "__main__":
 
     if cfg_port == 'None':
         cfg_port = None
+    else:
+        cfg_port = int(cfg_port)
 
     if cfg_ip == 'None':
         cfg_ip = None
