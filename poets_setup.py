@@ -84,6 +84,25 @@ if __name__ == "__main__":
                  colorbar=colorbar, variables=variables,
                  valid_range=valid_range, nan_value=nan_value)
 
+    # SOURCE SETTINGS ECV SWI
+    name = 'satellite-derived soil water index'
+    temp_res = 'daily'
+    host = '/home/eodc/Datapool/SWI_092_dailyimages/'
+    dirstruct = ['YYYY']
+    protocol = 'LOCAL'
+    filename = 'ESACCI-SOILMOISTURE-L3S-SWIV-COMBINED-{YYYY}{MM}{DD}000000-fv02.2.nc'
+    filedate = {'YYYY': (38, 42), 'MM': (42, 44), 'DD': (44, 46)}
+    begin_date = datetime(1978, 11, 01)
+    variables = ['swi']
+    valid_range (0, 0.6)
+    colorbar = 'jet_r'
+    nan_value = -9999
+
+    p.add_source(name, filename, filedate, temp_res, host, protocol,
+                 dirstruct=dirstruct, begin_date=begin_date,
+                 variables=variables, valid_range=valid_range,
+                 colorbar=colorbar, nan_value=nan_value)
+
     argv = sys.argv[1:]
 
     try:
