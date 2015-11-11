@@ -122,10 +122,13 @@ def image_bounds(country, sp_res, shapefile=None):
     """
     shp = ShapeGrid(country, sp_res, shapefile=shapefile)
 
-    lon_min = shp.arrlon.min()-(sp_res/2)
-    lon_max = shp.arrlon.max()+(sp_res/2)
-    lat_min = shp.arrlat.min()-(sp_res/2)
-    lat_max = shp.arrlat.max()+(sp_res/2)
+    lon_min = shp.arrlon.min() - (sp_res / 2)
+    lon_max = shp.arrlon.max() + (sp_res / 2)
+    lat_min = shp.arrlat.min() - (sp_res / 2)
+    lat_max = shp.arrlat.max() + (sp_res / 2)
+
+    if country == 'IN':
+        lat_max = 34.375 + (sp_res / 2)
 
     e_lon = lon_max - lon_min
     e_lat = lat_max - lat_min

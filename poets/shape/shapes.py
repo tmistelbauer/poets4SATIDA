@@ -108,7 +108,7 @@ class Shape(object):
         pos = False
         for i, rec in enumerate(sf.records()):
             for attr in rec:
-                if self.code == str(attr):
+                if str(self.code) == str(attr):
                     pos = i
                     break
 
