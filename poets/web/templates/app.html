@@ -10,7 +10,6 @@
 
 {% block body %}
 
-
 <script>
 $(document).ready(function () {
 	
@@ -198,164 +197,9 @@ $(document).ready(function () {
         ts.loadTS(false, false, {{sp_res}}, {{ range }}, false, true );
         ts.loadTS(false, false, {{sp_res}}, {{ range }}, true, true);
         ts.initDownLink(false, true);
-        ts.initDownLink(true);
-    });
-    
-    //================ SATIDA SPECIFIC STUFF ================================//
-
-    var formMarkers;   
-    
-
-    function fillFormSelect(names, ids){
-        var c = names.length;
-        for (var i = 0; i < c; i++){
-            $("#select_form").append($('<option>', { 
-                value: ids[i],
-                text : names[i] 
-            }));
-        }
-
-        $("#select_form option:selected").each(function(){
-            loadFormsloadSubmissionList($(this).val());
-        });
-    }
-
-    function addMarker(ll, popupClass, popupContentHTML, closeBox, overflow) {
-
-            var feature = new OpenLayers.Feature(formMarkers, ll); 
-            feature.closeBox = closeBox;
-            feature.popupClass = popupClass;
-            feature.data.popupContentHTML = popupContentHTML;
-            feature.data.overflow = (overflow) ? "auto" : "hidden";
-                    
-            var marker = feature.createMarker();
-
-            var markerClick = function (evt) {
-                if (this.popup == null) {
-                    this.popup = this.createPopup(this.closeBox);
-                    map.addPopup(this.popup);
-                    this.popup.show();
-                } else {
-                    this.popup.toggle();
-                }
-                currentPopup = this.popup;
-                OpenLayers.Event.stop(evt);
-            };
-            marker.events.register("mousedown", feature, markerClick);
-
-            formMarkers.addMarker(marker);
-    }
-
-    function removeOldMarkers(){
-	if (formMarkers != null){
-		formMarkers.clearMarkers();
-		map.removeLayer(formMarkers);
-		formMarkers.destroy();
-	}
-    }
-    
-    function loadForms(){
-        $.get( "http://148.251.42.101:8580/odk_aggregate/formList", function( data ) {
-          var xmlDoc = $.parseXML(data);
-          var formsNodes = xmlDoc.children[0].children;
-          var formURLs = [];
-          var formNames = [];
-          var formIDs = [];
-          var c = formsNodes.length;
-
-          for (var i = 0; i < c; i++) {
-            formURLs.push(formsNodes[i].attributes[0].nodeValue);
-            formNames.push(formsNodes[i].innerHTML);
-            formIDs.push(formsNodes[i].attributes[0].nodeValue.split("=")[1]);
-          }
-          fillFormSelect(formNames, formIDs);
-        });     
-    }
-    
-    
-    function loadFormsloadSubmissionList(formID){
-		removeOldMarkers();
-		formMarkers = new OpenLayers.Layer.Markers("GeoODK Forms");
-		map.addLayer(formMarkers);
-	        var requestURL = "http://148.251.42.101:8580/odk_aggregate/submissionList/" + formID;
-	        $.get( requestURL, function( data ) {
-	          var xmlDoc = $.parseXML(data);
-	          var idTags = xmlDoc.children[0].children[0].children;
-	          datasetIDs = [];
-	          var c = idTags.length;
-	          for (var i = 0; i < c; i++){
-	            downloadSubmission(formID, idTags[i].innerHTML);
-	          }
-	        });
-    }
-
-    function downloadSubmission(formID, submissionID){
-        var requestURL = "http://148.251.42.101:8580/odk_aggregate/downloadSubmission/";
-        requestURL += formID + "/" + submissionID;
-        $.get( requestURL, function( data ) {
-          var xmlDoc = $.parseXML(data);
-          placeSubmissionMarker(xmlDoc.children[0].children[0].children[0]);
-        });
-    }
-
-    function getLocation(submissionXML){
-        var locString = $(submissionXML).find("location")[0].innerHTML;
-        var location = locString.split(" ");
-        var lonLat = new OpenLayers.LonLat(parseFloat(location[1]) ,location[0] )
-              .transform(
-                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                map.getProjectionObject() // to Spherical Mercator Projection
-              );
-        return lonLat;
-    }
-    
-    function placeSubmissionMarker(submissionXML){
-        var lonLat = getLocation(submissionXML);
-		popupClass = OpenLayers.Popup.FramedCloud;
-		popupContentHTML = getPopupContent(submissionXML);
-		addMarker(lonLat, popupClass, popupContentHTML, true, true);
-    }
-
-    function getPopupContent(submissionXML){
-        var s = "<div><h1>Submission</h1>";
-        s += "<h2>Form Info</h2>"
-        s += "<table>";
-        var c = submissionXML.attributes.length;
-        for (var i = 0; i < c; i++){
-            s += "<tr><td>" + submissionXML.attributes[i].name + ": </td><td>" + submissionXML.attributes[i].value + "</td></tr>";
-        }
-        s += "</table>";
-        s += "<h2>Collected Info</h2>"
-        s += "<table>";
-        c = submissionXML.childNodes.length;
-        for (var i = 0; i < c; i++){
-            s += "<tr><td>" + submissionXML.childNodes[i].nodeName + ": </td><td>" + submissionXML.childNodes[i].innerHTML + "</td></tr>";
-        }
-        s += "</table>";
-        s += "</table></div>";
-        return s;
-    }
-
-    function placeSubmissionPopup(submissionXML, lonLat){
-        var popup = new OpenLayers.Popup.FramedCloud("Popup", 
-            lonLat, null, getPopupContent(submissionXML), null,
-            true // <-- true if we want a close (X) button, false otherwise
-        );
-        map.addPopup(popup);                
-    }
-       
-    assassments = new OpenLayers.Layer.Markers( "Assessments" );
-    map.addLayer(assassments);
-    loadForms();
-
-    $("#select_form").change(function () {
-        $("#select_form option:selected").each(function(){
-            loadFormsloadSubmissionList($(this).val());
-        });
-    });
-    
-    //========= END OF SATIDA SPECIFIC STUFF ================================//
-
+        ts.initDownLink(true, true);
+    })
+	
 });
 </script>
 
@@ -403,12 +247,6 @@ $(document).ready(function () {
 	                </button>
 	            </div>
             {% endif %}
-
-            <div class="form-group" style="float:right;">
-                <select class="form-control" id="select_form">
-                </select>
-            </div>
-
 	    </form>
 	  </div>
 	  
