@@ -127,7 +127,7 @@ if __name__ == "__main__":
             print '-o [start_app, fetch_data]'
         elif opt == '-o':
             if arg == 'start_app':
-                p.start_app(cfg_ip, port=cfg_port, r_host=cfg_rhost,
+                p.start_app(cfg_url, port=cfg_port, r_host=cfg_rhost,
                             r_port=cfg_rport, url=cfg_url)
             elif arg == 'fetch_data':
                 p.fetch_data()
