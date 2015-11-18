@@ -109,11 +109,16 @@ if __name__ == "__main__":
     valid_range = (0, 0.6)
     colorbar = 'jet_r'
     nan_value = -9999
+    src_file = {}
+    for reg in regions:
+        src_file[reg] = os.path.join(p.data_path, 'DATA', reg + '_' +
+                                     str(p.spatial_resolution) + '_' +
+                                     p.temporal_resolution + '_SWI.nc')
 
     p.add_source(name, filename, filedate, temp_res, host, protocol,
                  dirstruct=dirstruct, begin_date=begin_date,
                  variables=variables, valid_range=valid_range,
-                 colorbar=colorbar, nan_value=nan_value)
+                 colorbar=colorbar, nan_value=nan_value, src_file=src_file)
 
     argv = sys.argv[1:]
 
