@@ -66,6 +66,9 @@ if __name__ == "__main__":
                     'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha',
                     'Punjab', 'Rajasthan', 'Sikkim', 'Tamil', 'Telangana',
                     'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal']]
+
+    regions = ['CE']
+
     delete_rawdata = True
 
     p = Poet(rootpath, regions, spatial_resolution, temporal_resolution,
@@ -106,12 +109,12 @@ if __name__ == "__main__":
     filedate = {'YYYY': (38, 42), 'MM': (42, 44), 'DD': (44, 46)}
     begin_date = datetime(1978, 11, 01)
     variables = ['swi']
-    valid_range = (0, 0.6)
+    valid_range = (0, 1)
     colorbar = 'jet_r'
-    nan_value = -9999
+    nan_value = 1.79329991
     src_file = {}
     for reg in regions:
-        src_file[reg] = os.path.join(p.data_path, 'DATA', reg + '_' +
+        src_file[reg] = os.path.join(p.data_path, reg + '_' +
                                      str(p.spatial_resolution) + '_' +
                                      p.temporal_resolution + '_SWI.nc')
 
@@ -144,5 +147,11 @@ if __name__ == "__main__":
             print 'please give an argument'
 
     if len(opts) == 0:
-        p.start_app()
+        src = 'satellite-derived soil water index'
+
+        p.resample(datetime(2014, 1, 1), datetime(2014, 12, 31), False, src)
+
+        pass
+
+
 
